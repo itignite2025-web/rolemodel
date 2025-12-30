@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>著名人追加リクエスト</title>
+ <style>
+ body { font-family: sans-serif; padding: 20px; background-color: #f8eaf0; text-align: center; }
+ .form-container { max-width: 400px; margin: 50px auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+ h1 { color: #e6a8d8; }
+ input[type="text"], select { width: 90%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
+ button { background-color: #e6a8d8; color: white; padding: 12px 20px; border: none; border-radius: 25px; cursor: pointer; font-size: 1em; margin-top: 20px; }
+ button:hover { background-color: #d175b0; }
+/* h1の文字を小さくして一行に収まりやすくする */
+@media (max-width: 600px) {h1 {
+ font-size: 1.5em; /* スマホで一行に収まりやすいサイズに調整 */
+ }
+ }
+</style>
+</head>
+<body>
+ <div class="form-container">
+ <h1>✨ ロールモデル追加リクエスト ✨</h1>
+ <p>「この人もロールモデルに加えてほしい！」という著名人がいれば、ぜひ教えてください！</p>
+
+ <form id="celebrityRequestForm">
+ <input type="text" id="celebName" placeholder="著名人の名前 (例: 〇〇 〇〇)" required>  <select id="personalColor" required>
+ <option value="">パーソナルカラーを選択</option>
+ <option value="イエベ春">イエベ春</option>
+ <option value="イエベ秋">イエベ秋</option> 
+<option value="ブルベ夏">ブルベ夏</option>
+ <option value="ブルベ冬">ブルベ冬</option>
+ </select>
+
+ <select id="bodyType" required>
+ <option value="">骨格タイプを選択</option>
+ <option value="ストレート">ストレート</option>
+ <option value="ナチュラル">ナチュラル</option>
+<option value="ウェーブ">ウェーブ</option>
+ <option value="ウェーブに近いストレート">ウェーブに近いストレート</option>
+ <option value="ウェーブに近いナチュラル">ウェーブに近いナチュラル</option>
+ </select>
+
+ <select id="gender" required>
+<option value="">性別を選択</option>
+ <option value="male">男性</option>
+ <option value="female">女性</option>
+ </select>
+
+<button type="submit">リクエストを送信</button>
+<p style="font-size: 0.8em; color: #888; margin-top: 15px;">※ このデータはサーバーに送られ、今後の診断結果に追加される可能性があります。</p>
+</form>
+ <a href="javascript:history.back()" style="display: block; margin-top: 30px; color: #a05a87;">前の画面に戻る</a>
+ </div>
+
+<script>
+// ★★★ ここに、ステップ1-3でコピーしたGASの「ウェブアプリのURL」を貼り付けてください ★★★
+ const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwRrAfeNP8N-YiwpAlnQxltF2TMY-mj71g199CS9V9o-6ajCU9CBOFJ8Ns3nwE4-0-e/exec';
+        // 例: 'https://script.google.com/macros/s/AKfycbu2p5L2k5-dM5c8e3x6h9k5y1z7/exec';
+
+
+ document.getElementById('celebrityRequestForm').addEventListener('submit', function(e) {
+ e.preventDefault();
+            
+            // フォームデータを取得
+const name = document.getElementById('celebName').value;
+ const color = document.getElementById('personalColor').value;
+const body = document.getElementById('bodyType').value;
+ const gender = document.getElementById('gender').value;
+
+            // 送信するデータ（GASでパースしやすいようにオブジェクトで準備）
+            const dataToSend = {
+                celebName: name,
+                personalColor: color,
+                bodyType: body,
+                gender: gender
+            };
+
+            // GASのURLにデータをPOST送信
+            fetch(GAS_WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // GASへのPOST送信には 'no-cors' が必要
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // JSON文字列にして送信
+                body: JSON.stringify(dataToSend),
+            })
+            .then(response => {
+                // no-corsモードのため、レスポンスの中身は確認できないが、
+                // 通信が成功したことだけを確認し、処理を進める
+                console.log('GASへの送信を試みました。レスポンス:', response);
+                
+                alert(`著名人追加リクエストを承りました！\n\n名前: ${name}\nカラー: ${color}\n骨格: ${body}\n性別: ${gender}\n\nご協力ありがとうございます！`);
+
+                // フォームをクリアして前のページに戻る
+                this.reset();
+                // 戻り先のHTMLファイル名に置き換えてください
+                window.location.href = '25sindankanryou.html'; 
+            })
+            .catch(error => {
+                // 通信エラーが発生した場合
+                console.error('送信エラー:', error);
+                alert('リクエストの送信中にエラーが発生しました。時間を置いて再度お試しください。');
+            });
+});
+</script>
+</body>
+</html>
