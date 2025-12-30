@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>質問3</title>
+    <style>
+        body { background-color: #f8eaf0; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: sans-serif; padding: 20px; }
+        .container { width: 90%; max-width: 400px; padding: 30px 20px 0; border-radius: 20px; background-color: #f6e6f2; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; position: relative; }
+        .main-content { padding-bottom: 80px; }
+        .header { margin-bottom: 30px; }
+        .question-progress { display: flex; justify-content: space-around; width: 80%; margin: 0 auto 30px; }
+        .question-number { width: 30px; height: 30px; border-radius: 50%; border: 2px solid #d175b0; display: flex; justify-content: center; align-items: center; color: #d175b0; font-weight: bold; }
+        .question-number.active { background-color: #d175b0; color: white; }
+        .question-text { color: #555; font-size: 1.5em; font-weight: bold; }
+        .choice-buttons { display: flex; flex-direction: column; gap: 20px; margin-top: 40px; }
+        .choice-button { display: block; width: 80%; max-width: 250px; margin: 0 auto; padding: 15px; background-color: #e6a8d8; border: none; color: white; font-size: 1.1em; font-weight: bold; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; text-decoration: none; }
+        .choice-button:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
+        .ad-area { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background-color: #d3d3d3; color: #666; font-size: 0.9em; text-align: center; box-sizing: border-box; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <header class="header">
+                <div class="question-progress">
+                    <span class="question-number">1</span>
+                    <span class="question-number">2</span>
+                    <span class="question-number active">3</span>
+                    <span class="question-number">4</span>
+                    <span class="question-number">5</span>
+                </div>
+                <h1 class="question-text">Q3<br>白いシャツを着たとき<br>顔まわりの印象は？</h1>
+            </header>
+            <div class="choice-buttons">
+                <a href="16pasonarusindan5.html" class="choice-button" data-answer="A">真っ白なシャツで<br>顔がパッと明るく見える</a>
+                <a href="16pasonarusindan5.html" class="choice-button" data-answer="B">オフホワイトやアイボリーの<br>ほうが自然に馴染む</a>
+            </div>
+        </div>
+        <div class="ad-area">ー広告ー</div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const choiceButtons = document.querySelectorAll('.choice-button');
+
+            choiceButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault(); // デフォルトのリンク遷移を防止
+
+                    // data-answer属性から回答を取得
+                    const answer = event.currentTarget.getAttribute('data-answer');
+                    // ローカルストレージにQ3の回答を保存
+                    localStorage.setItem('q3Answer', answer);
+
+                    // 次のページ（質問4）へ遷移
+                    window.location.href = '15pasonarusindan4.html';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
