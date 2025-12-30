@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>質問5</title>
+    <style>
+        body {
+            background-color: #f8eaf0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            padding: 30px 20px 0;
+            border-radius: 20px;
+            background-color: #f6e6f2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        .main-content {
+            padding-bottom: 80px;
+        }
+
+        .header {
+            margin-bottom: 30px;
+        }
+
+        .question-progress {
+            display: flex;
+            justify-content: space-around;
+            width: 80%;
+            margin: 0 auto 30px;
+        }
+
+        .question-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            border: 2px solid #d175b0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #d175b0;
+            font-weight: bold;
+        }
+
+        .question-number.active {
+            background-color: #d175b0;
+            color: white;
+        }
+
+        .question-text {
+            color: #555;
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .choice-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .choice-button {
+            display: block;
+            width: 80%;
+            max-width: 250px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #e6a8d8;
+            border: none;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            text-decoration: none;
+        }
+
+        .choice-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .ad-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background-color: #d3d3d3;
+            color: #666;
+            font-size: 0.9em;
+            text-align: center;
+            box-sizing: border-box;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <div class="main-content">
+            <header class="header">
+                <div class="question-progress">
+                    <span class="question-number">1</span>
+                    <span class="question-number">2</span>
+                    <span class="question-number">3</span>
+                    <span class="question-number">4</span>
+                    <span class="question-number active">5</span>
+                </div>
+                <h1 class="question-text">Q5<br>肌を素顔で見た時の質感は？</h1>
+            </header>
+            <div class="choice-buttons">
+                <a href="17pasonarusinndannkannryou.html" class="choice-button" data-answer="A">透明感があって<br>ツヤやかな印象</a>
+                <a href="17pasonarusinndannkannryou.html" class="choice-button" data-answer="B">マットで落ち着いた印象</a>
+            </div>
+        </div>
+        <div class="ad-area">ー広告ー</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 選択ボタンをすべて取得します
+            const choiceButtons = document.querySelectorAll('.choice-button');
+
+            // すべてのボタンに共通のイベントリスナーを設定
+            choiceButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    event.preventDefault(); // リンクへの遷移を一旦キャンセル
+
+                    const answer = button.getAttribute('data-answer');
+                    localStorage.setItem('q5Answer', answer); // 回答をローカルストレージに保存
+
+                    displayResult(); // 最終診断を実行
+                });
+            });
+
+            // 最終診断を実行する関数
+            function displayResult() {
+                // Q1〜Q5の回答を取得
+                const baseType = localStorage.getItem('q1Answer') + localStorage.getItem('q2Answer') + localStorage.getItem('q3Answer');
+                const depthType = localStorage.getItem('q4Answer'); // Q4の回答
+                const textureType = localStorage.getItem('q5Answer'); // Q5の回答
+
+                let resultPage = '17pasonarusinndannkannryou.html'; // デフォルトの結果ページ
+                let resultType; // 診断結果のタイプを格納 (デバッグ用)
+
+                // イエベ・ブルベの判断（元のロジックを維持）
+                // Q1-Q3の組み合わせでベースタイプを判定
+                const isBlueBase = (baseType === 'AAA' || baseType === 'AAB' || baseType === 'ABA' || baseType === 'BAA');
+                const isYellowBase = (baseType === 'BBB' || baseType === 'BBA' || baseType === 'BAB' || baseType === 'ABB');
+
+                // タイプ（春・夏・秋・冬）の判断
+                if (isBlueBase) {
+                    // ブルベベースの場合
+                    if (depthType === 'A' && textureType === 'A') {
+                        // 条件が一致した場合: ブルベ夏（クリア・ツヤ）
+                        resultType = 'ブルベ夏';
+                    } else if (depthType === 'B' && textureType === 'B') {
+                        // 条件が一致した場合: ブルベ冬（ディープ・マット）
+                        resultType = 'ブルベ冬';
+                    } else {
+                        // Q4/Q5が混合パターン (A/B または B/A) の場合
+                        // ★修正点：ブルベの混合パターンを「ブルベ夏」に統一
+                        resultType = 'ブルベ夏';
+                    }
+                } else if (isYellowBase) {
+                    // イエベベースの場合
+                    if (depthType === 'A' && textureType === 'A') {
+                        // 条件が一致した場合: イエベ春（クリア・ツヤ）
+                        resultType = 'イエベ春';
+                    } else if (depthType === 'B' && textureType === 'B') {
+                        // 条件が一致した場合: イエベ秋（ディープ・マット）
+                        resultType = 'イエベ秋';
+                    } else {
+                        // Q4/Q5が混合パターン (A/B または B/A) の場合
+                        // ★修正点：イエベの混合パターンを「イエベ春」に統一
+                        resultType = 'イエベ春';
+                    }
+                } else {
+                    // イエベでもブルベでもないベースタイプ（Q1-Q3が未定義の組み合わせ）の場合
+                    resultType = 'ベース不明確';
+                }
+
+                // ローカルストレージに最終的な結果タイプを保存する（結果ページでの利用を想定）
+                localStorage.setItem('finalResultType', resultType);
+                
+                // 結果ページへ遷移
+                window.location.href = resultPage;
+
+                // 診断完了後にローカルストレージをクリアする（任意）
+                // localStorage.clear();
+            }
+        });
+    </script>
+</body>
+
+</html>
