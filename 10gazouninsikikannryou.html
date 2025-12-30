@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>顔分析結果・次へ</title>
+  <style>
+    body {
+      background-color: #f8eaf0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    .container {
+      width: 90%;
+      max-width: 400px;
+      padding: 30px 20px;
+      border-radius: 20px;
+      background-color: #f6e6f2;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    h1 {
+      color: #d175b0;
+      font-size: 1.8em;
+      border-bottom: 2px solid #e6a8d8;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .status-text {
+      color: #d175b0;
+      font-size: 1.6em;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    #result-summary {
+      background: #fff;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: left;
+    }
+    .next-button {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #d175b0;
+      color: #fff;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>分析が完了しました！</h1>
+
+  <p class="status-text">
+    あなたの顔の形は「<span id="face-shape-result">読み込み中...</span>」
+  </p>
+
+  <div id="result-summary">
+    <h3>顔の特徴</h3>
+    <p id="summary-text"></p>
+
+    <h3>おすすめの髪型</h3>
+    <p id="hair-text"></p>
+  </div>
+
+  <a id="next-page-link" class="next-button">次へ進む</a>
+</div>
+
+<script>
+// =============================
+// ① URLパラメータ取得
+// =============================
+const params = new URLSearchParams(location.search);
+const shape = params.get("shape") || "不明";
+
+// =============================
+// ② 性別取得（完全統一）
+// =============================
+const gender = localStorage.getItem('gender'); // male / female / other
+
+if (!['male', 'female', 'other'].includes(gender)) {
+  alert('性別情報が取得できません。最初からやり直してください。');
+  location.href = 'gender.html';
+}
+
+// =============================
+// ③ 表示
+// =============================
+document.getElementById("face-shape-result").textContent = shape;
+
+// =============================
+// ④ 要約DB
+// =============================
+const summaryDB = {
+  面長: "縦長シルエットが印象的。大人っぽく落ち着いた雰囲気。",
+  卵型: "黄金比に近い理想的な顔型。",
+  丸顔: "柔らかく親しみやすい印象。",
+  逆三角形: "シャープで都会的な印象。",
+  ベース型: "骨格がしっかりした知的な印象。",
+  不明: "顔情報が不足しています。"
+};
+
+document.getElementById("summary-text").textContent =
+  summaryDB[shape] || "診断不可";
+
+// =============================
+// ⑤ 髪型DB
+// =============================
+const hairDB = {
+  male: {
+    面長: ["センターパート", "重ためマッシュ", "ソフトツーブロック"],
+    卵型: ["七三分け", "マッシュウルフ", "フェードショート"],
+    丸顔: ["アップバング", "ツーブロック", "トップ長めショート"],
+    逆三角形: ["重めマッシュ", "サイドパート"],
+    ベース型: ["ラウンドマッシュ", "刈り上げショート"]
+  },
+  female: {
+    面長: ["前髪ありボブ", "外ハネミディアム"],
+    卵型: ["センターパート", "ショートボブ"],
+    丸顔: ["ひし形ショート", "レイヤーロング"],
+    逆三角形: ["ショートボブ", "外ハネレイヤー"],
+    ベース型: ["波巻きミディアム", "ワンレン"]
+  }
+};
+
+// =============================
+// ⑥ 髪型生成
+// =============================
+let hairText = "";
+
+if (gender === "other") {
+  hairText = "性別にとらわれない髪型をご提案します";
+} else if (hairDB[gender] && hairDB[gender][shape]) {
+  hairText = hairDB[gender][shape].join(" / ");
+} else {
+  hairText = "該当する髪型データがありません";
+}
+
+document.getElementById("hair-text").textContent = hairText;
+
+// =============================
+// ⑦ 次ページ
+// =============================
+document.getElementById("next-page-link").href = "11pasonarukara.html";
+</script>
+
+</body>
+</html>
