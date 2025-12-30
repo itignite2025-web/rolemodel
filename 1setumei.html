@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ロールモデル診断 - イントロダクション</title>
+    <style>
+        body {
+            background-color: #f8eaf0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 450px;
+            padding: 30px 20px;
+            border-radius: 20px;
+            background-color: #f6e6f2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .title {
+            color: #d175b0;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            margin: 20px 0;
+        }
+        .text-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .text-content p {
+            margin: 0;
+            padding: 0 10px;
+        }
+        .button {
+            display: block;
+            width: 80%;
+            max-width: 250px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #e6a8d8;
+            border: none;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ddd;
+        }
+        .dot.active {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">ロールモデルがわからない</h1>
+        </header>
+
+        <div class="image-container">
+            <img src="images/leader_business_man.png" alt="ロールモデルを説明するビジネスパーソンのイラスト">
+        </div>
+
+        <div class="text-content">
+            <p>ロールモデルは、「こんなふうになりたいな」と思える人のことです。例えば「目標になる人」のことです。</p>
+        </div>
+
+        <a href="2setumei2.html" class="button">次へ</a>
+
+        <div class="pagination">
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</body>
+</html>
