@@ -1,0 +1,524 @@
+ 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>診断結果</title>
+<style>
+/* ... スタイルはそのまま ... */
+body { background-color: #f8eaf0; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: sans-serif; padding: 20px; }
+.container { width: 90%; max-width: 450px; padding: 30px 20px; border-radius: 20px; background-color: #f6e6f2; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+.header { margin-bottom: 20px; }
+.title { color: #555; font-size: 1.5em; font-weight: bold; }
+.model-name { font-size: 2.2em; font-weight: bold; color: #e6a8d8; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.image-placeholder { 
+width: 250px; 
+height: 250px; 
+background-color: #ccc; 
+display: flex; 
+justify-content: center; 
+align-items: center; 
+border-radius: 10px; 
+margin: 0 auto 20px; 
+color: #666; 
+position: relative; 
+}
+.like-button {
+position: absolute;
+bottom: 10px;
+right: 10px;
+background: none;
+border: none;
+cursor: pointer;
+padding: 5px; 
+line-height: 1; 
+}
+
+ .heart-icon {
+font-size: 40px; 
+color: #e6a8d8; 
+text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); 
+transition: color 0.2s;
+display: flex;
+flex-direction: column; 
+align-items: center;
+justify-content: center;
+line-height: 1;
+}
+.heart-text {
+font-size: 10px; 
+font-weight: bold;
+color: #555; 
+text-shadow: none;
+margin-top: 2px; 
+}
+
+ .heart-icon:hover {
+color: #d175b0;
+}
+.section-title { font-size: 1.1em; font-weight: bold; color: #d175b0; margin-top: 30px; margin-bottom: 10px; }
+.makeup-container { display: flex; justify-content: space-around; gap: 10px; }
+.makeup-item { width: 60px; height: 60px; border: 2px solid #555; }
+.link-text { margin-top: 20px; margin-bottom: 20px; font-size: 1.1em; color: #a05a87; text-decoration: underline; }
+.button-group { display: flex; flex-direction: column; gap: 15px; }
+.button { display: block; width: 80%; max-width: 250px; margin: 0 auto; padding: 15px; border: none; color: white; font-size: 1.1em; font-weight: bold; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; text-decoration: none; }
+.button:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
+#snsOptions {
+display: none; 
+flex-direction: column;
+gap: 15px;
+margin-top: 15px; 
+padding-top: 15px;
+border-top: 1px dashed #e6a8d8;
+}
+#snsOptions.show {
+display: flex; 
+}
+.button.restart { background-color: #e6a8d8; }
+.button.share-toggle { background-color: #e6a8d8; } 
+.button.to-home { background-color: #e6a8d8; }
+.button.line { background-color: #00c300; }
+.button.x-twitter { background-color: #000000; }
+.button.copy { background-color: #8a3ab9; }
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header">
+<h2 class="title">あなたにぴったりな<br>ロールモデルは</h2>
+<h1 class="model-name" id="modelNameDisplay">診断結果に基づき表示中...</h1>
+</header>
+
+<div class="image-placeholder">
+写真挿入
+<button class="like-button" onclick="goToAddCelebrityPage()">
+<span class="heart-icon">
+❤️
+ <span class="heart-text">リクエスト欄</span>
+</span>
+ </button>
+</div>
+ 
+ <p class="section-title">愛用メイク用品</p>
+ <div class="makeup-container">
+ <div class="makeup-item"></div>
+ <div class="makeup-item"></div>
+ <div class="makeup-item"></div>
+ <div class="makeup-item"></div>
+ </div>
+ <a href="https://zozo.jp" class="link-text">ZOZOTOWNへ</a>
+ 
+ <div class="button-group">
+    <a href="index.html" class="button to-home">🏠 トップページに戻る</a>
+
+    <a href="6sindanstart.html" class="button restart">↺再診断</a>
+
+    <button id="shareButton" onclick="toggleShareOptions()" class="button share-toggle">
+     共有
+    </button>
+ 
+    <div id="snsOptions">
+        <a id="lineShareLink" href="#" class="button line" target="_blank">
+            LINEで共有
+        </a>
+        
+        <a id="xShareLink" href="#" class="button x-twitter" target="_blank">
+            X (Twitter) で共有
+        </a>
+
+        <button onclick="copyResult()" class="button copy">
+            結果をコピー<br> (Instagramなどへ)
+        </button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+ // ----------------------------------------------------
+// 【GAS連携 URL定義】
+// ----------------------------------------------------
+// 訪問記録（統計）用のGAS WebアプリURL
+const GAS_VISIT_URL = 'https://script.google.com/macros/s/AKfycbx_y5qZ0XOQp9_yKjMOXVXfMHO3G2q4e_x0FeS-7BnKD1syKek_Vc673ociAtIeQHcc/exec'; 
+
+// 診断履歴保存用のGAS WebアプリURL
+const GAS_HISTORY_URL = "https://script.google.com/macros/s/AKfycbxE2OsPJ6nbjDPoL7Db5kqN00k_Tl0KStQAMZQPODL771YdblKVmPP1_CEfFSyrW7BcGg/exec";
+
+// ----------------------------------------------------
+// 【1. 訪問人数を記録する関数】
+// ----------------------------------------------------
+/**
+ * ページアクセス時に訪問人数をGASに送信する関数。
+ * POSTボディは空で、GAS側でタイムスタンプを記録します。
+ */
+function recordPageView() {
+    fetch(GAS_VISIT_URL, {
+        method: 'POST', // POSTメソッドでデータを送信 (ボディなし)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('訪問記録GASへの送信に失敗しました。');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('訪問人数をスプレッドシートに記録しました:', data);
+    })
+    .catch(error => {
+        console.error('アクセスログ記録エラー:', error);
+    });
+}
+
+// ----------------------------------------------------
+// 【2. 診断履歴を記録する関数】
+// ----------------------------------------------------
+function sendHistoryToGoogleSheet(historyEntry) {
+
+  const dataToSend = {
+    date: new Date().toLocaleString("ja-JP"),
+    ageGroup: historyEntry.ageGroup,
+    faceShape: historyEntry.faceShape,
+    personalColor: historyEntry.personalColor,
+    bodyType: historyEntry.bodyType,
+    celebrityName: historyEntry.celebrityName,
+    gender: historyEntry.gender,
+similarCelebrity: historyEntry.similarCelebrity 
+  };
+ 
+
+
+  console.log("📤 送信データ:", dataToSend);
+
+
+  fetch(GAS_HISTORY_URL, {
+    method: 'POST',
+    // ✅ headers を完全に削除
+    body: JSON.stringify(dataToSend),
+    mode: 'no-cors'   // ✅ これが最重要
+  })
+  .then(() => {
+    console.log("✅ 診断履歴送信 完了（no-cors）");
+  })
+  .catch(error => {
+    console.error("❌ 診断履歴の送信エラー:", error);
+  });
+}
+
+
+
+   // 🚀 【新規】年代別・性別を考慮した有名人データテーブル（修正版）
+const celebrityData = [
+    // イエベ春
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '10s', gender: 'male', name: '宮世琉弥' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '20s', gender: 'male', name: '山田涼介' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '30s', gender: 'male', name: 'はじめしゃちょー' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '40s', gender: 'male', name: '菅田将暉' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '50s_over', gender: 'male', name: '藤森慎吾' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '10s', gender: 'female', name: '生見愛瑠' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '20s', gender: 'female', name: '本田翼' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '30s', gender: 'female', name: '有村架純' },
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '40s', gender: 'female', name: '上戸彩' }, 
+    { personalColor: 'イエベ春', bodyType: 'ストレート', age: '50s_over', gender: 'female', name: 'ベッキー' }, 
+
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '10s', gender: 'male', name: '藤原大祐' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '20s', gender: 'male', name: '佐野勇斗' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '30s', gender: 'male', name: '山下健二郎' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '40s', gender: 'male', name: '森山未來' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '50s_over', gender: 'male', name: '田村淳' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '10s', gender: 'female', name: '福本莉子' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '20s', gender: 'female', name: '貴島明日香' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '30s', gender: 'female', name: '西野七瀬' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '40s', gender: 'female', name: '篠田麻里子' },
+    { personalColor: 'イエベ春', bodyType: 'ナチュラル', age: '50s_over', gender: 'female', name: 'いとうあさこ' }, 
+
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '10s', gender: 'male', name: '那須雄登' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '20s', gender: 'male', name: '坂口健太郎' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '30s', gender: 'male', name: '松坂桃李（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '40s', gender: 'male', name: '星野源' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '50s_over', gender: 'male', name: 'DAIGO' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '10s', gender: 'female', name: '莉子' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '20s', gender: 'female', name: '橋本環奈' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '30s', gender: 'female', name: '佐々木希' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '40s', gender: 'female', name: '石原さとみ' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブ', age: '50s_over', gender: 'female', name: '松嶋菜々子' },
+
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'male', name: 'こたけ正義感' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'male', name: '櫻井翔' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'male', name: '竹内涼真' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'male', name: '小栗旬（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'male', name: '玉木宏' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'female', name: '齊藤なぎさ' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'female', name: '中条あやみ' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'female', name: '川口春奈' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'female', name: '深田恭子' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'female', name: '菅野美穂' },
+
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'male', name: 'かけまる' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'male', name: '佐久間大介' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'male', name: '三浦翔平' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'male', name: '綾野剛' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'male', name: 'ヒロミ' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'female', name: '南沙良' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'female', name: '藤田ニコル' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'female', name: '高畑充希' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'female', name: '小嶋陽菜' },
+    { personalColor: 'イエベ春', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'female', name: 'SHELLY' },
+
+    // イエベ秋
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '10s', gender: 'male', name: '森愁斗' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '20s', gender: 'male', name: '北村匠海' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '30s', gender: 'male', name: '吉沢亮（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '40s', gender: 'male', name: '佐藤浩市' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '50s_over', gender: 'male', name: '大泉洋' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '10s', gender: 'female', name: '田鍋梨々花' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '20s', gender: 'female', name: '今田美桜' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '30s', gender: 'female', name: '長澤まさみ' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '40s', gender: 'female', name: '篠原涼子' },
+    { personalColor: 'イエベ秋', bodyType: 'ストレート', age: '50s_over', gender: 'female', name: '米倉涼子' },
+
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '10s', gender: 'male', name: '中谷光希（モデル）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '20s', gender: 'male', name: '水上恒司' },
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '30s', gender: 'male', name: '伊勢谷友介（映画監督）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '40s', gender: 'male', name: '井浦新' },
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '50s_over', gender: 'male', name: '阿部寛' },
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '10s', gender: 'female', name: '原菜乃華' },
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '20s', gender: 'female', name: '小松菜奈' },
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '30s', gender: 'female', name: '吉岡里帆' },
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '40s', gender: 'female', name: '木村文乃' },
+    { personalColor: 'イエベ秋', bodyType: 'ナチュラル', age: '50s_over', gender: 'female', name: '天海祐希' },
+
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '10s', gender: 'male', name: '佐藤寛太' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '20s', gender: 'male', name: '松坂桃李' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '30s', gender: 'male', name: '常田大希' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '40s', gender: 'male', name: '及川光博' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '50s_over', gender: 'male', name: '福山雅治' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '10s', gender: 'female', name: '當真あみ' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '20s', gender: 'female', name: '川口春奈' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '30s', gender: 'female', name: '戸田恵梨香' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '40s', gender: 'female', name: '蒼井優' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブ', age: '50s_over', gender: 'female', name: '竹内結子' },
+
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'male', name: '金子大地' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'male', name: '佐藤健' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'male', name: '綾野剛' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'male', name: '玉木宏' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'male', name: '渡辺謙' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'female', name: '池田朱那' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'female', name: '山本舞香' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'female', name: '榮倉奈々' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'female', name: '北川景子' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'female', name: '松雪泰子' },
+
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'male', name: '西垣匠' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'male', name: '窪田正孝' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'male', name: '松下洸平' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'male', name: '妻夫木聡' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'male', name: '佐々木蔵之介' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'female', name: '山口らいら' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'female', name: '中村アン' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'female', name: '本田翼' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'female', name: '長谷川京子' },
+    { personalColor: 'イエベ秋', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'female', name: '友近' },
+
+    // ブルベ夏
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '10s', gender: 'male', name: '板垣李光人（俳優・モデル）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '20s', gender: 'male', name: '中川大志' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '30s', gender: 'male', name: '田中樹' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '40s', gender: 'male', name: '向井理' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '50s_over', gender: 'male', name: '及川光博' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '10s', gender: 'female', name: '小宮山莉渚' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '20s', gender: 'female', name: '上白石萌音' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '30s', gender: 'female', name: '石田ゆり子' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '40s', gender: 'female', name: '綾瀬はるか' },
+    { personalColor: 'ブルベ夏', bodyType: 'ストレート', age: '50s_over', gender: 'female', name: '松嶋菜々子' },
+
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '10s', gender: 'male', name: 'ラウール（Snowman)' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '20s', gender: 'male', name: '向井理（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '30s', gender: 'male', name: '横浜流星' },
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '40s', gender: 'male', name: '瑛太' },
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '50s_over', gender: 'male', name: '谷原章介' },
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '10s', gender: 'female', name: 'なえなの' },
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '20s', gender: 'female', name: '広瀬すず' },
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '30s', gender: 'female', name: '長澤まさみ' },
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '40s', gender: 'female', name: '石田ゆり子' },
+    { personalColor: 'ブルベ夏', bodyType: 'ナチュラル', age: '50s_over', gender: 'female', name: '原田知世' },
+
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '10s', gender: 'male', name: 'ばんばんざい・ぎし' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '20s', gender: 'male', name: '目黒蓮' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '30s', gender: 'male', name: '桐谷健太（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '40s', gender: 'male', name: '東出昌大' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '50s_over', gender: 'male', name: '稲葉浩志' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '10s', gender: 'female', name: 'きりたんぽ' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '20s', gender: 'female', name: '戸田恵梨香' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '30s', gender: 'female', name: '吉高由里子' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '40s', gender: 'female', name: '松たか子' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブ', age: '50s_over', gender: 'female', name: '中山美穂' },
+
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'male', name: 'チェンル（K-POP)' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'male', name: '福士蒼汰' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'male', name: '福山雅治' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'male', name: '竹内涼真' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'male', name: '反町隆史' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'female', name: '古川優奈' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'female', name: '松本穂香' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'female', name: '綾瀬はるか' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'female', name: '松嶋菜々子' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'female', name: '鈴木京香' },
+
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'male', name: '伊藤健太郎' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'male', name: '神木隆之介' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'male', name: '渡辺謙（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'male', name: '斎藤工' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'male', name: '西島秀俊' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'female', name: '長澤樹' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'female', name: '榮倉奈々' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'female', name: '新垣結衣' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'female', name: '黒木華' },
+    { personalColor: 'ブルベ夏', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'female', name: '深津絵里' },
+
+    // ブルベ冬
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '10s', gender: 'male', name: '加藤清史郎' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '20s', gender: 'male', name: '山崎賢人' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '30s', gender: 'male', name: '小栗旬（芸能人）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '40s', gender: 'male', name: '井上芳雄' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '50s_over', gender: 'male', name: 'GACKT' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '10s', gender: 'female', name: 'みとゆな' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '20s', gender: 'female', name: '吉川愛' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '30s', gender: 'female', name: '北川景子' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '40s', gender: 'female', name: '菜々緒' },
+    { personalColor: 'ブルベ冬', bodyType: 'ストレート', age: '50s_over', gender: 'female', name: '小池栄子' },
+
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '10s', gender: 'male', name: '當間ローズ' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '20s', gender: 'male', name: '菅田将暉' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '30s', gender: 'male', name: '田中圭' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '40s', gender: 'male', name: '渡部篤郎' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '50s_over', gender: 'male', name: '堺雅人' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '10s', gender: 'female', name: '小坂菜緒' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '20s', gender: 'female', name: '池田エライザ' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '30s', gender: 'female', name: '小松菜奈' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '40s', gender: 'female', name: '水原希子' },
+    { personalColor: 'ブルベ冬', bodyType: 'ナチュラル', age: '50s_over', gender: 'female', name: '天海祐希' },
+
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '10s', gender: 'male', name: '一ノ瀬颯' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '20s', gender: 'male', name: '松田元太' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '30s', gender: 'male', name: '松田翔太' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '40s', gender: 'male', name: '中村倫也（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '50s_over', gender: 'male', name: '木村拓哉' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '10s', gender: 'female', name: '山下美月' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '20s', gender: 'female', name: 'ミナ（K-POPアイドル（TWICE））' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '30s', gender: 'female', name: '堀未央奈' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '40s', gender: 'female', name: '吉田羊' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブ', age: '50s_over', gender: 'female', name: '小雪' },
+
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'male', name: '森山瑛' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'male', name: '中島健人' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'male', name: '町田啓太' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'male', name: '綾野剛' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'male', name: '舘ひろし（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '10s', gender: 'female', name: '井上和' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '20s', gender: 'female', name: '小池栄子' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '30s', gender: 'female', name: '中条あやみ' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '40s', gender: 'female', name: '杏' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いストレート', age: '50s_over', gender: 'female', name: '篠原涼子' },
+
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'male', name: 'ゆうた' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'male', name: 'ラウール（Snowman)' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'male', name: '菅田将暉（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'male', name: '山崎賢人（俳優）' }, // 修正後のテーブルに合わせて変更
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'male', name: '竹中直人' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '10s', gender: 'female', name: '白河れい' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '20s', gender: 'female', name: '二階堂ふみ' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '30s', gender: 'female', name: '池田エライザ' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '40s', gender: 'female', name: '小松菜奈' },
+    { personalColor: 'ブルベ冬', bodyType: 'ウェーブに近いナチュラル', age: '50s_over', gender: 'female', name: '黒木メイサ' },
+];
+
+
+// ----------------------------------------------------
+// 【DOMContentLoaded ブロック】
+// ----------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => { 
+    // ★重要: ここに診断結果の取得からGAS送信までの処理全体を配置★
+
+    // 診断結果の取得
+    const personalColor = localStorage.getItem('personalColorType'); 
+    const bodyType = localStorage.getItem('kotsukakuType');        
+    const gender = localStorage.getItem('gender'); // 取得
+    const faceShape = localStorage.getItem('faceShape');              
+    const ageGroup = localStorage.getItem('ageGroup');
+
+    let roleModelName = '診断結果が不明です'; 
+    let roleModelFound = false;
+    let historyEntry = null;
+
+    // 診断結果に基づいたロールモデルの検索 (celebrityDataはグローバルにあると仮定)
+    const result = celebrityData.find(item => 
+        item.personalColor === personalColor && 
+        item.bodyType === bodyType &&
+        item.gender === gender &&
+        item.age === ageGroup
+    );
+
+    if (result) {
+        roleModelName = result.name;
+        roleModelFound = true;
+    } else {
+        roleModelName = '該当の有名人は見つかりませんでした';
+    }
+
+    // HTML要素の更新
+    document.getElementById('modelNameDisplay').textContent = roleModelName;
+
+    // 履歴保存処理 (faceShapeを追加)
+    if (roleModelFound) {
+        historyEntry = { 
+            date: new Date().toLocaleString('ja-JP', { 
+                year: 'numeric', month: '2-digit', day: '2-digit', 
+                hour: '2-digit', minute: '2-digit' 
+            }).replace(/\//g, '/').replace(' ', ' '),
+            celebrityName: roleModelName,
+            personalColor: personalColor,
+            bodyType: bodyType,
+            ageGroup: ageGroup,
+            faceShape: faceShape || '未分析',
+            gender: gender // ★修正点★: historyEntryにも性別を追加
+        };
+        const history = JSON.parse(localStorage.getItem('diagnosisHistory')) || [];
+        history.unshift(historyEntry);
+        localStorage.setItem('diagnosisHistory', JSON.stringify(history.slice(0, 20)));
+        
+        // GASへのデータ送信処理を呼び出す
+        sendHistoryToGoogleSheet(historyEntry);
+    }
+    
+    // ... (以降の共有テキスト生成、ボタン処理、recordPageView() のコードが続く) ...
+    
+    const ageText = ageGroup ? ` / 年代: ${ageGroup.replace('s', '代').replace('_over', '代以上')}` : '';
+    const detailText = (faceShape) ? 
+        ` (PC: ${personalColor} / 骨格: ${bodyType}${ageText} / 顔型: ${faceShape})` : 
+        ` (PC: ${personalColor} / 骨格: ${bodyType}${ageText})`;
+    const shareText = `あなたにぴったりなロールモデルは【${roleModelName}】です！\n${detailText}`;
+    const shareUrl = "https://itignite2025/6sindanstart.html"; 
+
+    // 共有ボタンのURLを更新
+    const lineText = encodeURIComponent(`${shareText}\n\n⬇️あなたも診断してみる⬇️`);
+    const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${lineText}`;
+    document.getElementById('lineShareLink').href = lineUrl;
+
+    const xText = encodeURIComponent(shareText);
+    const xHashtags = encodeURIComponent("ロールモデル診断,パーソナルカラー,骨格診断");
+    const xUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${xText}&hashtags=${xHashtags}`;
+    document.getElementById('xShareLink').href = xUrl;
+
+    recordPageView(); // 統計機能の実行
+
+    // 共有オプション、コピー、リクエストページ遷移などの関数定義
+    window.toggleShareOptions = function() { /* ... */ };
+    window.copyResult = function() { /* ... */ };
+    window.goToAddCelebrityPage = function() { window.location.href = '26sindankanryou.html'; };
+
+}); // ★DOMContentLoadedの閉じ括弧はここだけ！★
+
+
+
+</script>
+</body>
+</html>
