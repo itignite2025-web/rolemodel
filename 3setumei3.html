@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ロールモデルの探し方</title>
+    <style>
+        body {
+            background-color: #f8eaf0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 450px;
+            padding: 30px 20px;
+            border-radius: 20px;
+            background-color: #f6e6f2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .title {
+            color: #d175b0;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .image-group {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            gap: 20px;
+        }
+        .image-group img {
+            width: 25%;
+            max-width: 80px;
+            height: auto;
+        }
+        .image-group .small-image {
+            width: 40%;
+            max-width: 120px;
+        }
+        .image-group .large-image {
+            width: 50%;
+            max-width: 180px;
+        }
+        .text-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0 10px;
+        }
+        .text-content p {
+            margin: 0;
+        }
+        .button {
+            display: block;
+            width: 80%;
+            max-width: 250px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #e6a8d8;
+            border: none;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ddd;
+        }
+        .dot.active {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">どうやって探すの？</h1>
+        </header>
+        
+        <div class="image-group">
+            <img src="images/TikTok_Icon_Black_Square.png" alt="TikTokのロゴ">
+            <img src="images/Instagram_Glyph_Gradient.png" alt="Instagramのロゴ">
+            <img src="images/logo-black.png" alt="X（旧Twitter）のロゴ"><br>
+            <img class="large-image" src="images/group_people_smartphone.png" alt="人々が歓喜するイラスト">
+        </div>
+
+        <div class="text-content">
+            <p>自分の目標や大事にしたいことを考えます。それから、本やSNS、身近な人の中から、考え方や生き方に共感できる人を見つけましょう。</p>
+        </div>
+
+        <a href="4setumei4.html" class="button">次へ</a>
+        
+        <div class="pagination">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</body>
+</html>
