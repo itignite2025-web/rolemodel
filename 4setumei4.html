@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>このアプリが解決します</title>
+    <style>
+        body {
+            background-color: #f8eaf0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+        .container {
+            width: 90%;
+            max-width: 450px;
+            padding: 30px 20px;
+            border-radius: 20px;
+            background-color: #f6e6f2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .title {
+            color: #d175b0;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .image-plus-text {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            gap: 15px;
+        }
+        .image-plus-text img {
+            height: auto;
+            max-width: 100px;
+        }
+        .image-plus-text .plus-sign {
+            font-size: 3em;
+            color: #d175b0;
+        }
+        .image-plus-text .question-text {
+            font-size: 1.5em;
+            color: #555;
+            font-weight: bold;
+        }
+        .text-content {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            text-align: left;
+            padding: 0 10px;
+        }
+        .text-content p {
+            margin: 0;
+        }
+        .button {
+            display: block;
+            width: 80%;
+            max-width: 250px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #e6a8d8;
+            border: none;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            text-decoration: none;
+        }
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ddd;
+        }
+        .dot.active {
+            background-color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">このアプリが解決します。</h1>
+        </header>
+
+        <div class="image-plus-text">
+            <img src="images/22879414.jpg" alt="AIを表現した脳のイラスト">
+            <span class="plus-sign">+</span>
+            <span class="question-text">質問8問</span>
+        </div>
+
+        <div class="text-content">
+            <p>ロールモデル診断にお任せください。このアプリはAIとパーソナルカラーといくつかの質問によってあなたにぴったりなロールモデルを探します。</p>
+        </div>
+
+        <a href="5setumei5.html" class="button">次へ</a>
+
+        <div class="pagination">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot active"></span>
+            <span class="dot"></span>
+        </div>
+    </div>
+</body>
+</html>
