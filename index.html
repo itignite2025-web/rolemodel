@@ -1,312 +1,284 @@
-<!doctype html>
-<html lang="ja">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>ロールモデル診断｜App Style</title>
-  <meta name="description" content="スマホでアプリのように使えるロールモデル診断。数分でタイプ判定＆おすすめアクションを表示。データは端末内で処理されます。" />
-  <meta name="theme-color" content="#0f172a" />
-  <!-- OGP（必要なら差し替え） -->
-  <meta property="og:type" content="website" />
-  <meta property="og:title" content="ロールモデル診断" />
-  <meta property="og:description" content="スマホでアプリのように使える診断ツール" />
-  <style>
-    :root{
-      --bg:#0f172a; --panel:#0b1324; --ink:#e5e7eb; --muted:#93a4bc;
-      --accent:#60a5fa; --accent2:#34d399; --danger:#ef4444; --ok:#22c55e;
-      --border:#1f2937; --r:16px; --navh:68px; --barh:4px;
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;background:var(--bg);color:var(--ink);
-      font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans JP","Yu Gothic",sans-serif;
-      -webkit-font-smoothing:antialiased;}
-    /* App Shell */
-    .app{min-height:100dvh;display:flex;flex-direction:column;}
-    .topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;padding:14px 16px;
-      background:linear-gradient(180deg,#0b1324,rgba(11,19,36,.85));backdrop-filter:blur(6px);
-      border-bottom:1px solid var(--border)}
-    .logo{width:28px;height:28px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:0 6px 20px rgba(96,165,250,.35)}
-    .title{margin:0;font-size:18px;font-weight:800}
-    .sub{margin:0;color:var(--muted);font-size:12px}
-    .progress{height:var(--barh);width:100%;background:#0a1020}
-    .bar{height:100%;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .35s ease}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    .main{flex:1;display:flex;flex-direction:column;}
-    .screen{flex:1;display:none;animation:.35s fade-in both}
-    .screen.active{display:flex;flex-direction:column}
-    @keyframes fade-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    <!-- ==============================
+    🟣 SEO Title（強化版）
+    =============================== -->
+    <title>ロールモデル診断｜有名人タイプ診断アプリ【無料】</title>
 
-    .card{background:linear-gradient(180deg,#0b1324,#0b1324cc), var(--panel);
-      border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.03)}
-    .hero{padding:18px}
+    <!-- ==============================
+    🟣 Meta SEO
+    =============================== -->
+    <meta name="description" content="ロールモデル診断アプリでは、あなたの見た目・雰囲気・似合う印象を分析し、有名人タイプを自動判定。無料・90秒で完了。パーソナルカラー・骨格・顔タイプを統合し、あなたにぴったりのロールモデルを提案します。">
+    <meta name="keywords" content="ロールモデル診断, ロールモデル診断アプリ, 顔診断, 骨格診断, パーソナルカラー診断, 有名人診断, 自己分析アプリ">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://itignite2025.com/">
 
-    .qhead{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 12px}
-    .qtitle{font-weight:800;font-size:18px;margin:0}
-    .badge{font-size:12px;padding:2px 8px;border-radius:999px;background:#0a1020;border:1px solid var(--border);color:var(--muted)}
+    <!-- ==============================
+    🟣 OGP / SNS表示最適化
+    =============================== -->
+    <meta property="og:title" content="ロールモデル診断｜有名人タイプ診断アプリ">
+    <meta property="og:description" content="無料でできるロールモデル診断アプリ。あなたに似ている有名人タイプをAIが分析して提案！">
+    <meta property="og:image" content="https://itignite2025.com/images/rolemodel.icom.png">
+    <meta property="og:url" content="https://itignite2025.com/">
+    <meta property="og:type" content="website">
 
-    .grid{display:grid;gap:10px}
-    @media(min-width:720px){.grid.cols-2{grid-template-columns:1fr 1fr}.grid.cols-3{grid-template-columns:repeat(3,1fr)}}
-    label.opt{display:flex;gap:10px;align-items:flex-start;padding:12px;border:1px solid var(--border);border-radius:12px;background:#0a1020;cursor:pointer}
-    input[type="radio"],input[type="checkbox"]{transform:translateY(3px)}
+    <meta name="twitter:card" content="summary_large_image">
 
-    .err{display:none;color:var(--danger);font-size:13px;margin-top:8px}
+    <!-- ==============================
+    🟣 PWA設定
+    =============================== -->
+    <link rel="manifest" href="/manifest.json"> 
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="診断アプリ">
 
-    /* Bottom Nav */
-    .nav{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(11,19,36,.8),#0b1324);backdrop-filter:blur(6px);
-      border-top:1px solid var(--border);padding:10px;display:flex;gap:10px}
-    .btn{flex:1;padding:12px 14px;border-radius:12px;border:1px solid var(--border);background:#0a1020;color:var(--ink);font-weight:700;cursor:pointer}
-    .btn.primary{background:var(--accent);color:#0b1324;border:none}
-    .btn:disabled{opacity:.5;cursor:not-allowed}
+    <link rel="apple-touch-icon" sizes="180x180" href="images/rolemodel.icom.png"> 
+    <link rel="icon" type="image/png" sizes="192x192" href="images/rolemodel.icom.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/rolemodel.icom.png">
 
-    .pill{display:inline-block;margin:4px 6px 0 0;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#0a1020;color:var(--ink)}
+    <!-- ==============================
+    🟣 構造化データ（検索最適化）
+    =============================== -->
+    <script type="application/ld+json">
 
-    .result h2{margin:0 0 6px;font-size:22px}
-    .muted{color:var(--muted)}
-
-    footer{padding:8px 14px;color:var(--muted);font-size:12px}
-  </style>
-</head>
-<body>
-  <div class="app">
-    <header class="topbar">
-      <div class="logo" aria-hidden="true"></div>
-      <div>
-        <h1 class="title">ロールモデル診断</h1>
-        <p class="sub">端末内で処理・匿名／スマホでアプリ風</p>
-      </div>
-    </header>
-    <div class="progress" aria-label="進捗"><div class="bar" id="bar"></div></div>
-
-    <main class="main" id="app" aria-live="polite">
-      <!-- Screen 0: Hero -->
-      <section class="screen active" data-title="スタート">
-        <div class="hero">
-          <div class="card">
-            <h2 style="margin:0 0 6px">ようこそ！</h2>
-            <p class="muted" style="margin:0 0 10px">数分で、あなたに合う「お手本の見つけ方」を判定。結果はおすすめアクション＆ハッシュタグ付き。</p>
-            <ul style="margin:0 0 6px 18px">
-              <li>全4セクション・戻る/次へOK</li>
-              <li>データは端末内でのみ保存（任意）</li>
-            </ul>
-          </div>
-        </div>
-        <div class="nav">
-          <button class="btn primary" data-next>診断をはじめる</button>
-        </div>
-      </section>
-
-      <!-- Screen 1: Focus -->
-      <section class="screen" data-title="重視点">
-        <div class="hero">
-          <header class="qhead"><h3 class="qtitle">重視するもの（1つ以上）</h3><span class="badge">必須</span></header>
-          <div class="grid cols-2">
-            <label class="opt"><input type="checkbox" name="focus" value="clean">清潔感アップ</label>
-            <label class="opt"><input type="checkbox" name="focus" value="self">自分らしさ</label>
-            <label class="opt"><input type="checkbox" name="focus" value="trend">流行/今っぽさ</label>
-            <label class="opt"><input type="checkbox" name="focus" value="cost">コスパ</label>
-            <label class="opt"><input type="checkbox" name="focus" value="work">TPO（学校/仕事）</label>
-            <label class="opt"><input type="checkbox" name="focus" value="sns">SNS映え</label>
-          </div>
-          <div class="err" id="err1"></div>
-        </div>
-        <div class="nav">
-          <button class="btn" data-back>戻る</button>
-          <button class="btn primary" data-next>次へ</button>
-        </div>
-      </section>
-
-      <!-- Screen 2: Sources -->
-      <section class="screen" data-title="探し方">
-        <div class="hero">
-          <header class="qhead"><h3 class="qtitle">普段の探し方（1つ以上）</h3><span class="badge">必須</span></header>
-          <div class="grid cols-2">
-            <label class="opt"><input type="checkbox" name="source" value="sns">SNS（Instagram/TikTok/YouTube）</label>
-            <label class="opt"><input type="checkbox" name="source" value="media">雑誌/ウェブ媒体</label>
-            <label class="opt"><input type="checkbox" name="source" value="tv">テレビ</label>
-            <label class="opt"><input type="checkbox" name="source" value="friends">友人・コミュニティ</label>
-            <label class="opt"><input type="checkbox" name="source" value="staff">ショップ店員/プロ相談</label>
-          </div>
-          <div class="err" id="err2"></div>
-        </div>
-        <div class="nav">
-          <button class="btn" data-back>戻る</button>
-          <button class="btn primary" data-next>次へ</button>
-        </div>
-      </section>
-
-      <!-- Screen 3: Budget & Time -->
-      <section class="screen" data-title="予算と時間">
-        <div class="hero">
-          <header class="qhead"><h3 class="qtitle">予算と時間（必須）</h3><span class="badge">必須</span></header>
-          <div class="grid cols-2">
-            <div class="card">
-              <div class="muted" style="margin-bottom:6px">月の予算感</div>
-              <label class="opt"><input type="radio" name="budget" value="low">低め（コスパ）</label>
-              <label class="opt"><input type="radio" name="budget" value="mid">ふつう</label>
-              <label class="opt"><input type="radio" name="budget" value="high">高め（品質重視）</label>
-            </div>
-            <div class="card">
-              <div class="muted" style="margin-bottom:6px">時間の使い方</div>
-              <label class="opt"><input type="radio" name="time" value="fast">時短で手早く</label>
-              <label class="opt"><input type="radio" name="time" value="research">調べて試すのが好き</label>
-              <label class="opt"><input type="radio" name="time" value="pro">店員/プロに相談</label>
-            </div>
-          </div>
-          <div class="err" id="err3"></div>
-        </div>
-        <div class="nav">
-          <button class="btn" data-back>戻る</button>
-          <button class="btn primary" data-next>次へ</button>
-        </div>
-      </section>
-
-      <!-- Screen 4: Style -->
-      <section class="screen" data-title="スタイル">
-        <div class="hero">
-          <header class="qhead"><h3 class="qtitle">好みのスタイル（1つ以上）</h3><span class="badge">必須</span></header>
-          <div class="grid cols-3">
-            <label class="opt"><input type="checkbox" name="style" value="minimal">ミニマル</label>
-            <label class="opt"><input type="checkbox" name="style" value="feminine">きれいめ</label>
-            <label class="opt"><input type="checkbox" name="style" value="street">ストリート</label>
-            <label class="opt"><input type="checkbox" name="style" value="mode">モード</label>
-            <label class="opt"><input type="checkbox" name="style" value="korean">韓国系</label>
-            <label class="opt"><input type="checkbox" name="style" value="vintage">ヴィンテージ</label>
-          </div>
-          <div class="err" id="err4"></div>
-        </div>
-        <div class="nav">
-          <button class="btn" data-back>戻る</button>
-          <button class="btn primary" id="finish">結果を見る</button>
-        </div>
-      </section>
-
-      <!-- Screen 5: Result -->
-      <section class="screen result" data-title="結果">
-        <div class="hero">
-          <div class="card">
-            <h2 id="persona">タイプ名</h2>
-            <p id="badge" class="muted" style="margin-top:-4px"></p>
-            <p id="summary" style="margin:10px 0 14px"></p>
-            <h3 style="margin:0 0 6px">おすすめの探し方</h3>
-            <ul id="howto" style="margin:0 0 14px 18px"></ul>
-            <h3 style="margin:0 0 6px">検索キーワード例</h3>
-            <div id="keywords" class="muted" style="margin-bottom:8px"></div>
-            <h3 style="margin:0 0 6px">おすすめハッシュタグ</h3>
-            <div id="tags" style="margin-bottom:10px"></div>
-            <details>
-              <summary>入力の要約</summary>
-              <pre id="answers" style="white-space:pre-wrap"></pre>
-            </details>
-          </div>
-        </div>
-        <div class="nav">
-          <button class="btn" id="again">もう一度</button>
-          <button class="btn primary" id="csv">CSV保存</button>
-        </div>
-      </section>
-    </main>
-
-    <footer>※トラッキングなし／結果は端末内のみ保存。必要に応じて専門家へご相談ください。</footer>
-  </div>
-
-  <script>
-    const $ = (s,el=document)=>el.querySelector(s); const $$ = (s,el=document)=>[...el.querySelectorAll(s)];
-    const screens = $$('.screen'); let idx = 0; const bar = $('#bar');
-    const requiredGroups = {
-      1:()=> hasOne('focus'),
-      2:()=> hasOne('source'),
-      3:()=> $('input[name="budget"]:checked') && $('input[name="time"]:checked'),
-      4:()=> hasOne('style')
-    };
-    function hasOne(name){return $$(`input[name="${name}"]:checked`).length>0}
-    function show(i){ screens.forEach((sc,n)=>sc.classList.toggle('active', n===i));
-      const max = screens.length-1; const pct = Math.min(100, (i/max)*100); bar.style.width = pct+'%'; window.scrollTo({top:0,behavior:'smooth'}); }
-
-    // nav handlers
-    $$('[data-next]').forEach(b=>b.addEventListener('click',()=>{ if(idx in requiredGroups){ const ok = requiredGroups[idx](); const err = $(`#err${idx}`); if(!ok){ if(err){err.style.display='block'; err.textContent='必須項目を選択してください。'} return; } if(err) err.style.display='none'; } idx=Math.min(idx+1, screens.length-1); show(idx);}));
-    $$('[data-back]').forEach(b=>b.addEventListener('click',()=>{ idx=Math.max(idx-1,0); show(idx); }));
-    $('#finish').addEventListener('click',()=>{ if(!requiredGroups[4]()) { const err=$('#err4'); err.style.display='block'; err.textContent='少なくとも1つ選んでください。'; return;} computeAndRender(); idx=5; show(idx); });
-
-    function collect(){
-      return {
-        focus: $$("input[name='focus']:checked").map(i=>i.value),
-        source: $$("input[name='source']:checked").map(i=>i.value),
-        budget: $("input[name='budget']:checked")?.value||'',
-        time: $("input[name='time']:checked")?.value||'',
-        style: $$("input[name='style']:checked").map(i=>i.value),
-        _ts: new Date().toISOString()
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "ロールモデル診断",
+      "url": "https://itignite2025.com/",
+      "description": "90秒でできる無料ロールモデル診断アプリ。あなたに似た有名人タイプを分析。",
+      "publisher": {
+        "@type": "Organization",
+        "name": "ロールモデル診断アプリ"
       }
     }
-    function score(data){
-      const s={trend:0,express:0,efficiency:0,research:0,practical:0,minimal:0,feminine:0,street:0,mode:0,korean:0,vintage:0};
-      data.focus.forEach(v=>{ if(v==='clean'){s.efficiency++;s.practical++;} if(v==='self'){s.express+=2;} if(v==='trend'){s.trend+=2;} if(v==='cost'){s.efficiency+=2;} if(v==='work'){s.practical+=2;} if(v==='sns'){s.trend++;s.express++;} });
-      data.source.forEach(v=>{ if(v==='sns')s.trend++; if(v==='media')s.research++; if(v==='tv')s.practical++; if(v==='friends')s.express++; if(v==='staff')s.practical+=2; });
-      if(data.budget==='low') s.efficiency++; if(data.budget==='high') s.trend++;
-      if(data.time==='fast') s.efficiency+=2; if(data.time==='research') s.research+=2; if(data.time==='pro') s.practical+=2;
-      data.style.forEach(v=>{ if(v==='minimal'){s.minimal+=2;s.efficiency++;s.practical++;}
-        if(v==='feminine'){s.feminine+=2;s.trend++;} if(v==='street'){s.street+=2;s.express++;}
-        if(v==='mode'){s.mode+=2;s.trend++;} if(v==='korean'){s.korean+=2;s.trend++;}
-        if(v==='vintage'){s.vintage+=2;s.express++;} });
-      return s;
-    }
-    function decide(s){
-      if(s.efficiency>=s.trend && s.efficiency>=s.express && s.minimal>=2) return {key:'minimalist',name:'ミニマリスト実践家',badge:'効率×清潔感',
-        summary:'“少ない手間で最大の整い”。定番を軸に失敗コストを下げるタイプ。',
-        howto:['ベース服/コスメを固定し1in1out','ECはレビュー高評価で絞る','買い物時間の上限を決める'],
-        tags:['#ミニマル','#ベーシック','#タイパ']};
-      if(s.trend>=s.express && s.trend>=s.research && s.trend>=s.efficiency) return {key:'trend',name:'トレンド・キュレーター',badge:'流行キャッチ',
-        summary:'“今っぽさ”を素早く再現。共通項抽出が得意。',
-        howto:['同骨格の発信者を3人フォロー','月1でトレンド棚卸し','保存→実行チェック'],
-        tags:['#今っぽ','#トレンド','#垢抜け']};
-      if(s.express>s.trend && s.express>=s.efficiency) return {key:'creator',name:'自己表現クリエイター',badge:'個性×編集',
-        summary:'らしさ起点で要素編集。ムードボードが武器。',
-        howto:['色/質感/形でボード化','小物で“サイン”を1点','発信→FB→改善のPDCA'],
-        tags:['#マイルール','#古着MIX','#セルフスタイリング']};
-      if(s.research>=s.trend && s.research>=s.express) return {key:'researcher',name:'知識派リサーチャー',badge:'検証思考',
-        summary:'比較検証・一次情報を好み再現性を重視。',
-        howto:['要素分解メモを作る','月1カテゴリでABテスト','長短レビューの両取り'],
-        tags:['#比較表','#レビュー検証','#ベストバイ']};
-      if(s.practical>=s.trend && s.practical>=s.express) return {key:'realist',name:'プロ活用のリアリスト',badge:'TPO×相談上手',
-        summary:'目的に合わせてプロを頼り、短時間で整える堅実派。',
-        howto:['目的/予算/期限を先に伝える','上下どちらかは提案に委ねる','保守ケアをルーティン化'],
-        tags:['#TPO','#就活コーデ','#時短美容']};
-      return {key:'balanced',name:'バランス派ナビゲーター',badge:'いいとこ取り',
-        summary:'流行・個性・効率のバランスで失敗を減らす。',
-        howto:['定番7:遊び3の配分','やらないことリスト更新','保存→実行日セット'],
-        tags:['#定番','#使い回し','#カプセルワードローブ']};
-    }
-    function computeAndRender(){
-      const data = collect(); const s = score(data); const p = decide(s);
-      $('#persona').textContent=p.name; $('#badge').textContent=p.badge; $('#summary').textContent=p.summary;
-      $('#howto').innerHTML=p.howto.map(t=>`<li>${t}</li>`).join('');
-      $('#tags').innerHTML=p.tags.map(t=>`<span class="pill">${t}</span>`).join('');
-      const styleWords = data.style.map(v=>({minimal:'ミニマル',feminine:'きれいめ',street:'ストリート',mode:'モード',korean:'韓国',vintage:'ヴィンテージ'}[v]||v));
-      const base=['コーデ','着回し','骨格タイプ','パーソナルカラー','メイク'];
-      const head={minimalist:['ベーシック','ワードローブ','タイパ'],trend:['今っぽ','最新'],creator:['個性','スタイリング'],researcher:['比較','検証'],realist:['TPO','就活'],balanced:['定番','応用']}[p.key]||[];
-      const words=[...new Set([...head,...styleWords,...base])];
-      $('#keywords').innerHTML=[`Instagram: ${words.slice(0,5).map(w=>'#'+w).join(' ')}`,
-        `TikTok/YouTube: ${(styleWords[0]||'スタイル')} HowTo BeforeAfter`,
-        `Web検索: ${(styleWords[0]||'スタイル')} おすすめ 再現`].map(l=>`<div class="pill" style="display:block">${l}</div>`).join('');
-      $('#answers').textContent=JSON.stringify({重視:data.focus,探し方:data.source,予算:data.budget||'—',時間:data.time||'—',スタイル:data.style},null,2);
-      try{localStorage.setItem('rolemodel:last',JSON.stringify({data,s,p}))}catch(e){}
-    }
+    </script>
 
-    $('#again').addEventListener('click',()=>{ screens.forEach(s=>s.scrollTop=0); idx=1; // 1から再開
-      $$('#app input[type="checkbox"]').forEach(i=>i.checked=false);
-      $$('#app input[type="radio"]').forEach(i=>i.checked=false);
-      show(idx);
-    });
-    $('#csv').addEventListener('click',()=>{
-      try{const saved=JSON.parse(localStorage.getItem('rolemodel:last')||'{}'); if(!saved.data) return alert('データがありません');
-        const row={timestamp:saved.data._ts,focus:(saved.data.focus||[]).join('|'),source:(saved.data.source||[]).join('|'),budget:saved.data.budget,time:saved.data.time,style:(saved.data.style||[]).join('|'),persona:saved.p?.name||''};
-        const keys=Object.keys(row); const csv=[keys.join(','),keys.map(k=>`"${String(row[k]??'').replaceAll('"','""')}"`).join(',')].join('\n');
-        const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='rolemodel_result.csv'; a.click(); URL.revokeObjectURL(a.href);
-      }catch(e){alert('CSV生成に失敗しました');}
+    <style>
+        body {
+            background-color: #f8eaf0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            transition: background-color 0.3s ease;
+        }
+        .container {
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 20px;
+            background-color: #f6e6f2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .title {
+            color: #d175b0;
+            font-size: 2.5em;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .subtitle {
+            color: #a05a87;
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 40px;
+        }
+        .button {
+            background-color: #e6a8d8;
+            border: none;
+            color: white;
+            padding: 15px 10px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal {
+            display: none;
+            position: absolute;
+            z-index: 100;
+            width: 100%;
+            max-width: 320px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            left: 50%;
+            transform: translateX(-50%);
+            animation: fadeIn 0.2s;
+        }
+
+        #infoModal {
+            top: -10px;
+        }
+
+        .closeBtn {
+            float: right;
+            font-size: 20px;
+            cursor: pointer;
+            color: #888;
+        }
+
+        .detail-link {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: #e6a8d8;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -10px); }
+            to { opacity: 1; transform: translate(-50%, 0px); }
+        }
+
+        .button.start-diagnosis::after {
+            content: '📸 ';
+            font-size: 1.2em;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .button.contact-us::after {
+            content: '📩 ';
+            font-size: 1.2em;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .title { font-size: 2em; }
+            .subtitle { font-size: 1em; }
+            .button-group { gap: 10px; }
+            .button { padding: 12px 8px; font-size: 0.9em; }
+        }
+
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .container { max-width: 500px; padding: 30px; }
+            .title { font-size: 3em; }
+            .subtitle { font-size: 1.5em; }
+            .button-group { gap: 20px; }
+            .button { padding: 18px 12px; font-size: 1.1em; }
+        }
+
+        @media (min-width: 1025px) {
+            .container { width: 70%; max-width: 700px; padding: 50px; border-radius: 30px; }
+            .title { font-size: 4em; }
+            .subtitle { font-size: 1.8em; }
+            .button { font-size: 1.2em; padding: 20px 15px; }
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <div class="container">
+        <header class="header">
+            <h1 class="title">ロールモデル診断</h1>
+            <p class="subtitle">— あなたのロールモデルを探します —</p>
+        </header>
+
+        <main>
+            <div class="button-group">
+                <button id="openModalBtn" class="button">診断について</button> 
+
+                <div id="infoModal" class="modal">
+                    <div class="modal-content">
+                        <span class="closeBtn">&times;</span>
+                        <h2>診断について</h2>
+                        <p>
+                            この診断では、あなたの「見た目」「雰囲気」「似合う印象」などを
+                            複数の観点から分析し、ロールモデルとなる有名人タイプを導き出します。
+                            所要時間は約90秒です。
+                        </p>
+                        <p>詳しく知りたい方はこちら👇</p>
+                        <a href="1setumei1.html" class="detail-link">▶ 詳しく見る</a>
+                    </div>
+                </div>
+
+                <a href="7nenrei.html" class="button start-diagnosis">診断スタート</a>
+                <a href="27sindanrireki.html" class="button">診断履歴</a>
+                <a href="https://forms.gle/J1stu9nmzxUfRcQX9" class="button contact-us" target="_blank">お問い合わせ</a>
+            </div>
+        </main>
+    </div>
+
+    <script>
+
+
+
+
+
+    const modal = document.getElementById("infoModal");
+    const openBtn = document.getElementById("openModalBtn");
+    const closeBtn = document.querySelector(".closeBtn");
+
+    openBtn.addEventListener("click", () => {
+      modal.style.display = "block";
     });
 
-    // initial
-    show(idx);
-  </script>
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+    });
+
+    const shareData = {
+        title: 'ロールモデル診断',
+        text: '私にぴったりのロールモデルが見つかる！あなたも診断してみませんか？',
+        url: window.location.href
+    };
+
+    async function shareApp() {
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {}
+        } else {
+            try {
+                await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+                alert("アプリのリンクをコピーしました！");
+            } catch (err) {
+                alert("コピーに失敗しました。URLを手動でコピーしてください。");
+            }
+        }
+    }
+    </script>
+
 </body>
 </html>
