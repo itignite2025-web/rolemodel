@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>パーソナルカラー診断スタート</title>
+    <style>
+        body { background-color: #f8eaf0; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: sans-serif; padding: 20px; }
+        .container { width: 90%; max-width: 400px; padding: 30px 20px 0; border-radius: 20px; background-color: #f6e6f2; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; position: relative; }
+        .main-content { padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 250px; /* ボタンと広告エリアの間のスペースを確保 */ }
+        .header { margin-bottom: 50px; }
+        /* タイトルを濃いピンク (#d175b0) で太字に */
+        .title { color: #d175b0; font-size: 1.8em; font-weight: bold; }
+        .start-button-area { margin-top: auto; margin-bottom: auto; } /* 中央配置用 */
+        /* スタートボタンのスタイル */
+        .start-button { 
+            display: block; 
+            width: 80%; 
+            max-width: 250px; 
+            margin: 0 auto; 
+            padding: 20px 15px; /* パディングを増やして大きく見せる */
+            background-color: #d175b0; /* 濃いピンク */
+            border: none; 
+            color: white; 
+            font-size: 1.5em; /* フォントサイズを大きく */
+            font-weight: bold; 
+            border-radius: 30px; /* 角を丸く */
+            cursor: pointer; 
+            box-shadow: 0 6px 10px rgba(0,0,0,0.15); /* より立体的な影 */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; 
+            text-decoration: none; 
+        }
+        .start-button:hover { 
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 12px rgba(0,0,0,0.2); 
+            background-color: #bb619b; /* ホバー時に少し色を変える */
+        }
+        .ad-area { position: absolute; bottom: 0; left: 0; width: 100%; padding: 15px; background-color: #d3d3d3; color: #666; font-size: 0.9em; text-align: center; box-sizing: border-box; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <header class="header"><h1 class="title">骨格診断</h1></header>
+            <div class="start-button-area">
+                <a href="24kokkakusinndannknnryou.html" class="start-button">スタート</a>
+            </div>
+        </div>
+        <div class="ad-area">ー広告ー</div>
+    </div>
+</body>
+</html>
