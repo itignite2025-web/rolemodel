@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>診断結果</title>
+<style>
+body { background-color: #f8eaf0; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; font-family: sans-serif; padding: 20px; }
+.container { width: 90%; max-width: 450px; padding: 30px 20px; border-radius: 20px; background-color: #f6e6f2; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+.header { margin-bottom: 20px; }
+.title { color: #d175b0; font-size: 1.8em; font-weight: bold; }
+.result-text { font-size: 1.2em; margin-bottom: 10px; color: #555; }
+.result-type { font-size: 2.2em; font-weight: bold; color: #e6a8d8; text-shadow: 1px 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+.image-container img { max-width: 100%; height: auto; border-radius: 10px; margin-bottom: 20px; }
+.description-text { color: #555; line-height: 1.6; padding: 0 10px; margin-bottom: 30px; }
+.next-button { display: block; width: 80%; max-width: 250px; margin: 0 auto; padding: 15px; background-color: #e6a8d8; border: none; color: white; font-size: 1.1em; font-weight: bold; border-radius: 25px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; text-decoration: none; margin-top: 30px; }
+.next-button:hover { transform: translateY(-2px); box-shadow: 0 6px 8px rgba(0,0,0,0.15); }
+</style>
+</head>
+<body>
+<div class="container">
+<header class="header">
+<h2 class="result-text">あなたのパーソナルカラーは</h2>
+<h1 class="result-type" id="result-type">診断中...</h1>
+</header>
+<div class="image-container">
+<img id="result-image" src="" alt="診断結果のイメージ">
+</div>
+<p class="description-text" id="result-description">診断結果が表示されます。</p>
+<a href="19kokkaku.html" class="next-button">次へ</a>
+</div>
+</body>
+</html>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // ローカルストレージからすべての回答を取得
+    const q1 = localStorage.getItem('q1Answer');
+    const q2 = localStorage.getItem('q2Answer');
+    const q3 = localStorage.getItem('q3Answer');
+    const q4 = localStorage.getItem('q4Answer');
+    const q5 = localStorage.getItem('q5Answer');
+    const gender = localStorage.getItem('gender'); // 性別情報を取得
+
+    const baseAnswers = q1 + q2 + q3;
+    let resultType = "診断不能";
+    let descriptionText = "診断に必要な情報が不足しています。";
+    let imageUrl = "placeholder.png";
+
+    // シーズンタイプごとの画像URLを定義
+    // ★★★ ファイル名が、imagesフォルダ内の実際のファイルと一致しているか確認してください ★★★
+    const images = {
+        'ブルベ夏': {
+            male:'BBsummer.m.png',
+            female:'BBsummer.f.png'
+        },
+        'ブルベ冬': {
+            male:'BBwinter.m.png',
+            female:'BBwinterr.f.png'
+        },
+        'イエベ春': {
+            male:'YBspring.m.png',
+           female:'YBspring.f.png' 
+        },
+        'イエベ秋': {
+            male: 'YBautumn,m.png',
+            female:'YBautumn,f.png'
+        }
+    };
+
+    // パーソナルカラーを判定するロジック
+    const isBlueBase = (baseAnswers === 'AAA' || baseAnswers === 'AAB' || baseAnswers === 'ABA' || baseAnswers === 'BAA');
+    const isYellowBase = (baseAnswers === 'BBB' || baseAnswers === 'BBA' || baseAnswers === 'BAB' || baseAnswers === 'ABB');
+
+
+    if (isBlueBase) {
+        if (q4 === 'A' && q5 === 'A') {
+            resultType = 'ブルベ夏';
+            descriptionText = '涼しげで透明感のある肌が特徴で、爽やかで優しい色合いが似合います。';
+            imageUrl = images['ブルベ夏'][gender];
+        } else if (q4 === 'B' && q5 === 'B') {
+            resultType = 'ブルベ冬';
+            descriptionText = 'シャープで都会的な印象の肌が特徴で、鮮やかでハッキリとした色が似合います。';
+            imageUrl = images['ブルベ冬'][gender];
+        } else if ((q4 === 'A' && q5 === 'B') || (q4 === 'B' && q5 === 'A')) {
+            // Q4がA/Q5がB、またはQ4がB/Q5がAの時に「ブルベ夏」に分類
+            resultType = 'ブルベ夏'; 
+            descriptionText = 'ブルベ夏とブルベ冬の要素を併せ持っています。まずはソフトで優しい色合いのブルベ夏の色を試すのがおすすめです。特に、明るさ（明度）や鮮やかさ（彩度）のどちらかが優先されている可能性があります。';
+            imageUrl = images['ブルベ夏'][gender];
+        }
+    } else if (isYellowBase) {
+        if (q4 === 'A' && q5 === 'A') {
+            resultType = 'イエベ春';
+            descriptionText = '明るくツヤのある肌が特徴で、暖かくクリアな色が似合います。';
+            imageUrl = images['イエベ春'][gender];
+        } else if (q4 === 'B' && q5 === 'B') {
+            resultType = 'イエベ秋';
+            descriptionText = '落ち着いたマットな肌が特徴で、深みのあるリッチな色が似合います。';
+            imageUrl = images['イエベ秋'][gender];
+        } else if ((q4 === 'A' && q5 === 'B') || (q4 === 'B' && q5 === 'A')) {
+            // Q4がA/Q5がB、またはQ4がB/Q5がAの時に「イエベ春」に分類
+            resultType = 'イエベ春';
+            descriptionText = 'イエベ春とイエベ秋の要素を併せ持っています。まずは明るくツヤのあるイエベ春の色を試すのがおすすめです。特に、明るさ（明度）や深み（彩度）のどちらかが優先されている可能性があります。';
+            imageUrl = images['イエベ春'][gender];
+        }
+    }
+
+    // 💡 診断結果をローカルストレージに保存 💡
+    if (resultType !== "診断不能") {
+        localStorage.setItem('personalColorType', resultType);
+    }
+
+    // HTML要素に結果を反映
+    document.getElementById('result-type').textContent = resultType;
+    document.getElementById('result-description').textContent = descriptionText;
+    // 画像パスが設定されている場合のみimgタグのsrcを更新
+    if (imageUrl) {
+         // 画像URLが画像の配列で定義されているため、画像をimages/フォルダに保存していることを前提にパスを修正します。
+        document.getElementById('result-image').src = 'images/' + imageUrl;
+    }
+
+    // 診断完了後、次の診断に不要な回答情報をクリア
+    // 性別情報('gender')、パーソナルカラーの結果('personalColorType')はクリアしない
+    localStorage.removeItem('q1Answer');
+    localStorage.removeItem('q2Answer');
+    localStorage.removeItem('q3Answer');
+    localStorage.removeItem('q4Answer');
+    localStorage.removeItem('q5Answer');
+});
+</script>
