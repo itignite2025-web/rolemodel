@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>年齢選択</title>
+ <style>
+ /* ... 省略 (スタイルはそのまま) ... */
+ body {
+ background-color: #f8eaf0;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ min-height: 100vh;
+ margin: 0;
+ font-family: sans-serif;
+ }
+.container {
+ 
+ width: 90%;
+ max-width: 400px;
+ padding: 30px 20px 0;
+ border-radius: 20px;
+ background-color: #f6e6f2;
+ text-align: center;
+ position: relative;
+ }
+ .main-content {
+ padding-bottom: 80px;
+  /* 広告エリアのためのスペース */
+ }
+ .header {
+ margin-bottom: 20px;
+ }
+ .title {
+ color: #d175b0;
+ font-size: 1.5em;
+ font-weight: bold;
+ }
+ .age-select {
+ margin: 30px 0;
+ }
+ .age-select select {
+ width: 80%;
+ max-width: 250px;
+ padding: 15px;
+ font-size: 1em;
+ border: 2px solid #e6a8d8;
+ border-radius: 10px;
+ background-color: #fce7f5;
+ color: #555;
+ appearance: none; /* デフォルトの矢印を非表示に */
+ -webkit-appearance: none;
+ -moz-appearance: none;
+ cursor: pointer;
+ }
+ .select-wrapper {
+ position: relative;
+ display: inline-block;
+ }
+ .select-wrapper::after {
+ content: 'V';
+ font-size: 1em;
+ color: #d175b0;
+ position: absolute;
+ right: 20px;
+ top: 50%;
+ transform: translateY(-50%);
+ pointer-events: none;
+ }
+.age-list {
+ margin: 40px 0;
+ text-align: left;
+ padding: 0 20px;
+ }
+ .age-list ul {
+ list-style: none;
+ padding: 0;
+ margin: 0;
+ color: #d175b0;
+ font-size: 1.2em;
+ }
+.age-list li {
+ padding: 8px 0;
+ }
+.ad-area {
+ position: absolute;
+ bottom: 0;
+ left: 0;
+ width: 100%;
+ padding: 15px;
+ background-color: #d3d3d3;
+ color: #666;
+ font-size: 0.9em;
+ text-align: center;
+ box-sizing: border-box;
+ border-bottom-left-radius: 20px;
+ border-bottom-right-radius: 20px;
+ }
+ .button {
+ display: block;
+ width: 80%;
+ max-width: 250px;
+ margin: 0 auto;
+ padding: 15px;
+ background-color: #e6a8d8;
+ border: none;
+ color: white;
+ font-size: 1.1em;
+ font-weight: bold;
+ border-radius: 25px;
+ cursor: pointer;
+ box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+ transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+ text-decoration: none;
+}
+ /* 選択で遷移するため、このボタンは非表示にするか、次のステップに進むための予備として残します */
+.button.hidden-on-select {
+ display: none;
+ }
+</style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <header class="header">
+                <h1 class="title">あなたの年齢を教えてください</h1>
+            </header>
+
+            <div class="age-select">
+                <div class="select-wrapper">
+                    <select name="age" id="age-select" onchange="changePage()">
+                        <option value="">年齢を選択</option>
+                        <option value="10s">0～19歳</option>
+                        <option value="20s">20代</option>
+                        <option value="30s">30代</option>
+                        <option value="40s">40代</option>
+                        <option value="50s_over">50代～</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="ad-area">
+                ー広告ー
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function changePage() {
+            // セレクトボックスの要素を取得
+            const selectElement = document.getElementById('age-select');
+            // 選択された値を取得
+            const selectedValue = selectElement.value;
+
+            // 選択された値が空（「年齢を選択」）でなければ遷移する
+            if (selectedValue !== "") {
+                // ***【追加・修正】選択された年齢グループをLocalStorageに保存***
+                localStorage.setItem('ageGroup', selectedValue);
+                
+                // 次のページに遷移
+                window.location.href = "8seibetu.html";
+            }
+        }
+    </script>
+</body>
+</html>
