@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顔分析ページ（AI認識版）</title>
+  
+
+    <!-- Mediapipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils"></script>
+
+    <style>
+        body {
+            background-color: #f8eaf0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 350px;
+            padding: 30px 20px 30px; 
+            border-radius: 20px;
+            background-color: #f6e6f2;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            height: 600px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ad-area { 
+            width: 90%;
+            height: 350px;
+            background-color: #d3d3d3;
+            border-radius: 10px;
+            overflow: hidden; 
+            position: relative; 
+        }
+
+        #camera-video,
+        #face-canvas {
+            position: absolute;
+            height: 100%;
+            width: auto;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%) scaleX(-1);
+            object-fit: cover;
+        }
+
+        .next-button { 
+            width: 80%;
+            max-width: 250px;
+            padding: 15px;
+            background-color: #e6a8d8;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px auto;
+        }
+
+        #next-page-link {
+            background-color: #3cb371; 
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h2 style="color:#d175b0;">AI顔分析を始めます！</h2>
+    <p id="message">カメラを起動しています...</p>
+
+    <div class="ad-area">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="face-canvas"></canvas>
+        <div id="placeholder">ーカメラ準備中ー</div>
+    </div>
+<p style="font-size: 0.85em; color: #999; text-align: center; margin-top: 10px;">
+  ※本結果はAIによる分析に基づくものであり、<br>参考程度にご利用ください。
+</p>
+
+    <button id="start-button" class="next-button" disabled>分析を始める</button>
+    <a href="10gazouninnsikikannryou.html" id="next-page-link" class="next-button">
+        結果を見る
+    </a>
+
+</div>
+
+<script>
+
+// =============================
+// 必須DOM
+// =============================
+const video = document.getElementById('camera-video');
+const canvas = document.getElementById('face-canvas');
+const ctx = canvas.getContext('2d');
+const startButton = document.getElementById('start-button');
+const nextPageLink = document.getElementById('next-page-link');
+const message = document.getElementById('message');
+const placeholder = document.getElementById('placeholder');
+
+canvas.width = 400;
+canvas.height = 300;
+
+let facePoints = null;
+let frameData = [];
+
+
+// =============================
+// Mediapipe 設定
+// =============================
+const faceMesh = new FaceMesh({
+  locateFile: (file) =>
+    `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`
+});
+
+faceMesh.setOptions({
+  maxNumFaces: 1,
+  refineLandmarks: true,
+  minDetectionConfidence: 0.6,
+  minTrackingConfidence: 0.6
+});
+
+
+// =============================
+// カメラスタート
+// =============================
+const camera = new Camera(video, {
+  onFrame: async () => {
+    await faceMesh.send({image: video});
+  },
+  width: 1280,
+  height: 720
+});
+
+camera.start();
+
+
+// =============================
+// 計算処理
+// =============================
+function saveResult(name, value) {
+    try {
+        localStorage.setItem(name, String(value));
+        console.log("保存:", name, value);
+    } catch (e) {
+        console.error("保存エラー:", e);
+    }
+}
+
+function classifyShape(avg) {
+  if (avg.face > 1.45) return "面長";
+  if (avg.face < 1.30) return "丸顔";
+  if (avg.jaw < 0.70) return "逆三角形";
+  if (avg.jaw > 0.85) return "ベース型";
+  return "卵型";
+}
+
+// =============================
+// 顔比率計算
+// =============================
+function calcFaceAvg(points) {
+  const top = points[10];
+  const bottom = points[152];
+  const left = points[234];
+  const right = points[454];
+  const jawLeft = points[172];
+  const jawRight = points[397];
+
+  const faceHeight = Math.abs(top.y - bottom.y);
+  const faceWidth  = Math.abs(left.x - right.x);
+  const jawWidth   = Math.abs(jawLeft.x - jawRight.x);
+
+  return {
+    face: faceHeight / faceWidth,
+    jaw: jawWidth / faceWidth
+  };
+}
+
+// =============================
+// 顔スコア計算
+// =============================
+function calcFaceScore(avg) {
+  const ideal = 1.38;
+  const diff = Math.abs(avg.face - ideal);
+
+  let score = Math.round(100 - diff * 80);
+  if (score > 95) score = 95;
+  if (score < 65) score = 65;
+
+  return score;
+}
+
+
+
+// =============================
+// Mediapipe結果受取
+// =============================
+faceMesh.onResults(results => {
+  if (!results.multiFaceLandmarks) return;
+
+  placeholder.style.display = "none";
+  startButton.disabled = false;
+  message.textContent = "顔を検出しました！分析可能です";
+
+  const pts = results.multiFaceLandmarks[0];
+  facePoints = pts;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  drawConnectors(ctx, pts, FACEMESH_TESSELATION, {color: '#FF8080', lineWidth:1});
+});
+
+
+// =============================
+// 実行
+// =============================
+startButton.addEventListener('click', () => {
+
+  if (!facePoints) {
+    alert("顔が検出できていません");
+    return;
+  }
+
+ // =============================
+// 性別取得（URL → localStorage → fallback）
+// =============================
+const params = new URLSearchParams(location.search);
+let gender = params.get('gender');
+
+// URLにあれば保存
+if (["male", "female", "other"].includes(gender)) {
+  localStorage.setItem('gender', gender);
+} else {
+  // なければlocalStorageから取得
+  gender = localStorage.getItem('gender');
+}
+
+// 最終チェック
+
+
+console.log("使用する gender:", gender);
+
+  // ★ 顔型計算
+  const avg = calcFaceAvg(facePoints);
+  const shape = classifyShape(avg);
+  const score = calcFaceScore(avg);
+  const hair  = "short / layer";
+
+  console.log("avg:", avg);
+  console.log("shape:", shape);
+  console.log("score:", score);
+
+  saveResult("faceShape", shape);
+  saveResult("faceScore", score);
+  saveResult("faceGender", gender);
+  saveResult("faceHair", hair);
+
+  const url =
+    `10gazouninnsikikannryou.html?shape=${encodeURIComponent(shape)}&score=${encodeURIComponent(score)}&gender=${encodeURIComponent(gender)}`;
+
+  window.location.href = url;
+});
+
+
+
+</script>
+
+</body>
+</html>
